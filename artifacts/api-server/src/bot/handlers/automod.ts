@@ -8,7 +8,9 @@ const LINK_PATTERN = /https?:\/\/([\w-]+(\.[\w-]+)+)(\/[^\s]*)?/gi;
 function containsBadWord(text: string): boolean {
   const lower = text.toLowerCase().replace(/\s+/g, "");
   const lowerSpaced = text.toLowerCase();
-  return config.badWords.some((w) => lower.includes(w.replace(/\s/g, "")) || lowerSpaced.includes(w));
+  return config.badWords.some(
+    (w) => lower.includes(w.replace(/\s/g, "")) || lowerSpaced.includes(w)
+  );
 }
 
 function containsBlockedLink(text: string): boolean {
@@ -28,19 +30,20 @@ export async function handleAutoMod(message: Message): Promise<void> {
   if (message.author.bot) return;
   if (!message.guild) return;
 
-  const member = message.guild.members.cache.get(message.author.id);
+  const member = await message.guild.members.fetch(message.author.id).catch(() => null);
 
   if (member?.permissions.has(PermissionFlagsBits.ManageMessages)) return;
   if (config.adminRoleIds.length > 0 && config.adminRoleIds.some((id) => member?.roles.cache.has(id))) return;
 
+  const content = message.content;
   let reason: string | null = null;
 
-  if (containsBadWord(message.content)) {
+  if (containsBadWord(content)) {
     reason = "küfür içeren mesaj";
-  } else if (containsBlockedLink(message.content)) {
+  } else if (containsBlockedLink(content)) {
     reason = "izin verilmeyen link";
   } else {
-    reason = checkSpam(message.author.id, message.content);
+    reason = checkSpam(message.author.id, content);
   }
 
   if (!reason) return;
