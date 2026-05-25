@@ -5,7 +5,13 @@ import {
   REST,
   Routes,
   ChatInputCommandInteraction,
+  ChannelType,
 } from "discord.js";
+import {
+  joinVoiceChannel,
+  VoiceConnectionStatus,
+  entersState,
+} from "@discordjs/voice";
 import { config } from "./config.js";
 import { handleAutoMod } from "./handlers/automod.js";
 import { logger } from "../lib/logger.js";
@@ -31,12 +37,48 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 
 const commandCollection = new Collection<string, CommandModule>();
 for (const cmd of commands) {
   commandCollection.set(cmd.data.name, cmd);
+}
+
+async function joinConfiguredVoiceChannel() {
+  if (!config.voiceChannelId) return;
+
+  const channel = await client.channels.fetch(config.voiceChannelId).catch(() => null);
+  if (!channel || channel.type !== ChannelType.GuildVoice) {
+    logger.error("Ses kanalı bulunamadı veya geçerli bir ses kanalı değil");
+    return;
+  }
+
+  const connection = joinVoiceChannel({
+    channelId: channel.id,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
+    selfDeaf: true,
+    selfMute: true,
+  });
+
+  connection.on(VoiceConnectionStatus.Disconnected, async () => {
+    try {
+      await Promise.race([
+        entersState(connection, VoiceConnectionStatus.Signalling, 5000),
+        entersState(connection, VoiceConnectionStatus.Connecting, 5000),
+      ]);
+    } catch {
+      logger.warn("Ses kanalı bağlantısı kesildi, yeniden bağlanılıyor...");
+      setTimeout(() => joinConfiguredVoiceChannel(), 5000);
+      connection.destroy();
+    }
+  });
+
+  connection.on(VoiceConnectionStatus.Ready, () => {
+    logger.info(`Ses kanalına bağlanıldı: ${channel.name}`);
+  });
 }
 
 client.once("ready", async (c) => {
@@ -50,6 +92,8 @@ client.once("ready", async (c) => {
   } catch (err) {
     logger.error({ err }, "Komutlar kaydedilemedi");
   }
+
+  await joinConfiguredVoiceChannel();
 });
 
 client.on("messageCreate", async (message) => {

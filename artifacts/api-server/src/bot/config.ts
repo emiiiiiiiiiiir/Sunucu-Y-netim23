@@ -3,6 +3,8 @@ export const config = {
 
   adminRoleIds: (process.env["ADMIN_ROLE_IDS"] ?? "").split(",").map((s) => s.trim()).filter(Boolean),
 
+  voiceChannelId: process.env["VOICE_CHANNEL_ID"] ?? "",
+
   badWords: [
     "küfür1", "küfür2", "orospu", "siktir", "amk", "amına", "bok", "göt", "oç",
     "piç", "yarrak", "yarak", "orospu", "fahişe", "kahpe", "ibne", "götveren",
