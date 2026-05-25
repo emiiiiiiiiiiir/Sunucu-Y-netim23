@@ -5,11 +5,15 @@ export const config = {
 
   voiceChannelId: process.env["VOICE_CHANNEL_ID"] ?? "",
 
+  // Tek kelimeler: token başıyla eşleşir (Türkçe ek alabilir, ör. "amklara" → amk ile yakalanır)
+  // Çok kelimeli ifadeler: tam metinde aranır
   badWords: [
-    "orospu", "siktir", "amk", "amına", "amina", "bok", "göt", "got", "oç", "oc",
-    "piç", "pic", "yarrak", "yarak", "fahişe", "fahise", "kahpe", "ibne",
-    "götveren", "orospu çocuğu", "orospuçocuğu", "sikerim", "sikeyim",
-    "amcık", "amcik", "götoğlanı", "ananı", "anani", "ananı sikim",
+    "orospu", "siktir", "amk", "amına", "amina", "bok",
+    "göt", "oç", "piç", "yarrak", "yarak",
+    "fahişe", "fahise", "kahpe", "ibne",
+    "götveren", "sikerim", "sikeyim",
+    "amcık", "amcik", "ananı", "anani",
+    "orospu çocuğu", "orospuçocuğu", "ananı sikim",
     "fuck", "shit", "bitch", "cunt", "dick", "pussy", "asshole", "motherfucker",
     "nigger", "nigga",
   ],

@@ -5,12 +5,35 @@ import { checkSpam } from "../utils/spam.js";
 
 const LINK_PATTERN = /https?:\/\/([\w-]+(\.[\w-]+)+)(\/[^\s]*)?/gi;
 
+// Kelime ayırıcılar: boşluk, noktalama, özel karakterler
+const TOKEN_SPLITTER = /[\s.,!?;:()\[\]{}"'\/\\@#\-_+=|~`]+/;
+
 function containsBadWord(text: string): boolean {
-  const lower = text.toLowerCase().replace(/\s+/g, "");
-  const lowerSpaced = text.toLowerCase();
-  return config.badWords.some(
-    (w) => lower.includes(w.replace(/\s/g, "")) || lowerSpaced.includes(w)
-  );
+  const lower = text.toLowerCase();
+
+  // Boşluksuz versiyon: "a m k" gibi bypass girişimlerini yakala
+  // Sadece harfler arasındaki boşlukları kaldır, kelime başı/sonu korunur
+  const tokens = lower.split(TOKEN_SPLITTER).filter(Boolean);
+
+  // Boşluk bypass için: sadece 1-2 karakter arası boşluklu yazımları yakala (ör. "a m k")
+  const noSpaceTokens = tokens.map((t) => t.replace(/\s/g, ""));
+
+  return config.badWords.some((w) => {
+    const badWord = w.toLowerCase();
+
+    // Çok kelimeli ifade: tam metinde ara
+    if (badWord.includes(" ")) {
+      return lower.includes(badWord);
+    }
+
+    // Tek kelime: her token'ın başıyla eşleştir
+    // (Türkçe ek alabilir: "amk" → "amklara", "orospu" → "orosbuya")
+    return tokens.some(
+      (token) => token === badWord || token.startsWith(badWord)
+    ) || noSpaceTokens.some(
+      (token) => token === badWord || token.startsWith(badWord)
+    );
+  });
 }
 
 function containsBlockedLink(text: string): boolean {
