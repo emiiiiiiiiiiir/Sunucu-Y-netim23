@@ -1,7 +1,7 @@
 export const config = {
   token: process.env["DISCORD_TOKEN"] ?? "",
 
-  adminRoleId: process.env["ADMIN_ROLE_ID"] ?? "",
+  adminRoleIds: (process.env["ADMIN_ROLE_IDS"] ?? "").split(",").map((s) => s.trim()).filter(Boolean),
 
   badWords: [
     "küfür1", "küfür2", "orospu", "siktir", "amk", "amına", "bok", "göt", "oç",

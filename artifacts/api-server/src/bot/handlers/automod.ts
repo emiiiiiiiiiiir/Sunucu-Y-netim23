@@ -26,7 +26,7 @@ export async function handleAutoMod(message: Message): Promise<void> {
   const member = message.guild.members.cache.get(message.author.id);
 
   if (member?.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-  if (config.adminRoleId && member?.roles.cache.has(config.adminRoleId)) return;
+  if (config.adminRoleIds.length > 0 && config.adminRoleIds.some((id) => member?.roles.cache.has(id))) return;
 
   let reason: string | null = null;
 
