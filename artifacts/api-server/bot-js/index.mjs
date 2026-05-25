@@ -99,6 +99,7 @@ client.once("ready", async (c) => {
 
 // --- Mesaj geldiğinde automod ---
 client.on("messageCreate", async (message) => {
+  console.log(`[Debug] Mesaj alındı | Yazar: ${message.author.tag} | Bot: ${message.author.bot} | İçerik uzunluğu: ${message.content?.length ?? 0} | İçerik: "${message.content?.slice(0, 60)}"`);
   try {
     await handleAutoMod(message);
   } catch (err) {
