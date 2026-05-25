@@ -5,21 +5,27 @@ import {
   EmbedBuilder,
   GuildMember,
 } from "discord.js";
+import { hasAdminRole } from "../utils/hasAdminRole.js";
 
 export const data = new SlashCommandBuilder()
   .setName("kick")
-  .setDescription("Kullanıcıyı sunucudan at")
+  .setDescription("Kullaniciy sunucudan at")
   .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
+    opt.setName("kullanici").setDescription("Kullanici").setRequired(true)
   )
   .addStringOption((opt) =>
     opt.setName("sebep").setDescription("Atma sebebi").setRequired(false)
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  if (!await hasAdminRole(interaction)) {
+    await interaction.reply({ content: "Bu komutu kullanmak icin gerekli role sahip degilsin.", ephemeral: true });
+    return;
+  }
+
   if (!interaction.guild) {
-    await interaction.reply({ content: "Bu komut sadece sunucularda kullanılabilir.", ephemeral: true });
+    await interaction.reply({ content: "Bu komut sadece sunucularda kullanilabilir.", ephemeral: true });
     return;
   }
 
@@ -28,12 +34,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const sebep = interaction.options.getString("sebep") ?? "Belirtilmedi";
 
   if (!target) {
-    await interaction.reply({ content: "Kullanıcı sunucuda bulunamadı.", ephemeral: true });
+    await interaction.reply({ content: "Kullanici sunucuda bulunamadi.", ephemeral: true });
     return;
   }
 
   if (!target.kickable) {
-    await interaction.reply({ content: "Bu kullanıcıyı atamam.", ephemeral: true });
+    await interaction.reply({ content: "Bu kullaniciy atamam.", ephemeral: true });
     return;
   }
 
@@ -41,11 +47,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await target.kick(sebep);
     const embed = new EmbedBuilder()
       .setColor(0xffa500)
-      .setTitle("👢 Kullanıcı Atıldı")
-      .setDescription(`**${user.tag}** sunucudan atıldı.\n**Sebep:** ${sebep}`)
+      .setTitle("Kullanici Atildi")
+      .setDescription(`**${user.tag}** sunucudan atildi.\n**Sebep:** ${sebep}`)
       .setTimestamp();
     await interaction.reply({ embeds: [embed] });
   } catch {
-    await interaction.reply({ content: "Kick işlemi sırasında hata oluştu.", ephemeral: true });
+    await interaction.reply({ content: "Kick islemi sirasinda hata olustu.", ephemeral: true });
   }
 }

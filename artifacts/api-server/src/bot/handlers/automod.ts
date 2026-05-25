@@ -24,12 +24,14 @@ export async function handleAutoMod(message: Message): Promise<void> {
   if (!message.guild) return;
 
   const member = message.guild.members.cache.get(message.author.id);
+
   if (member?.permissions.has(PermissionFlagsBits.ManageMessages)) return;
+  if (config.adminRoleId && member?.roles.cache.has(config.adminRoleId)) return;
 
   let reason: string | null = null;
 
   if (containsBadWord(message.content)) {
-    reason = "küfür içeren mesaj";
+    reason = "kufur iceren mesaj";
   } else if (containsBlockedLink(message.content)) {
     reason = "izin verilmeyen link";
   }
@@ -39,16 +41,16 @@ export async function handleAutoMod(message: Message): Promise<void> {
   try {
     await message.delete();
   } catch {
-    // mesaj zaten silinmiş olabilir
+    // mesaj zaten silinmis olabilir
   }
 
   const warnCount = addWarn(message.guild.id, message.author.id);
 
   const embed = new EmbedBuilder()
     .setColor(0xff4444)
-    .setTitle("⚠️ Uyarı")
+    .setTitle("Uyari")
     .setDescription(
-      `${message.author}, **${reason}** nedeniyle uyarıldın.\nToplam uyarı: **${warnCount}/${config.warnLimit}**`
+      `${message.author}, **${reason}** nedeniyle uyarildin.\nToplam uyari: **${warnCount}/${config.warnLimit}**`
     )
     .setTimestamp();
 
@@ -59,19 +61,19 @@ export async function handleAutoMod(message: Message): Promise<void> {
 
   if (warnCount >= config.warnLimit) {
     try {
-      await member?.timeout(10 * 60 * 1000, `${config.warnLimit} uyarıya ulaşıldı`);
+      await member?.timeout(10 * 60 * 1000, `${config.warnLimit} uyariya ulasildi`);
       if ("send" in message.channel) {
         const muteEmbed = new EmbedBuilder()
           .setColor(0xff0000)
-          .setTitle("🔇 Susturuldu")
+          .setTitle("Susturuldu")
           .setDescription(
-            `${message.author} ${config.warnLimit} uyarıya ulaştığı için **10 dakika** susturuldu.`
+            `${message.author} ${config.warnLimit} uyariya ulastigi icin **10 dakika** susturuldu.`
           )
           .setTimestamp();
         await message.channel.send({ embeds: [muteEmbed] });
       }
     } catch {
-      // timeout izni yoksa sessizce geç
+      // timeout izni yoksa sessizce gec
     }
   }
 }
