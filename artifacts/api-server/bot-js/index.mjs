@@ -5,6 +5,7 @@ import {
   REST,
   Routes,
   ChannelType,
+  ActivityType,
 } from "discord.js";
 import {
   joinVoiceChannel,
@@ -83,6 +84,18 @@ async function joinVoice() {
 // --- Bot hazır ---
 client.once("ready", async (c) => {
   console.log(`[Bot] Giriş yapıldı: ${c.user.tag}`);
+
+  // Durum: Rahatsız Etme + İzliyor aktivitesi
+  c.user.setPresence({
+    status: "dnd",
+    activities: [
+      {
+        name: "Imperial Forces Sunucularını",
+        type: ActivityType.Watching,
+      },
+    ],
+  });
+  console.log("[Bot] Durum ayarlandı: DND + İzliyor");
 
   // Slash komutlarını Discord'a kaydet
   const rest = new REST().setToken(config.token);
