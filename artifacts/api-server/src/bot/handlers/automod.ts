@@ -3,13 +3,17 @@ import { config } from "../config.js";
 import { addWarn } from "../utils/warns.js";
 import { checkSpam } from "../utils/spam.js";
 
+const LINK_PATTERN = /https?:\/\/([\w-]+(\.[\w-]+)+)(\/[^\s]*)?/gi;
+
 function containsBadWord(text: string): boolean {
-  const lower = text.toLowerCase();
-  return config.badWords.some((w) => lower.includes(w));
+  const lower = text.toLowerCase().replace(/\s+/g, "");
+  const lowerSpaced = text.toLowerCase();
+  return config.badWords.some((w) => lower.includes(w.replace(/\s/g, "")) || lowerSpaced.includes(w));
 }
 
 function containsBlockedLink(text: string): boolean {
-  const matches = text.matchAll(config.linkPattern);
+  const pattern = new RegExp(LINK_PATTERN.source, LINK_PATTERN.flags);
+  const matches = text.matchAll(pattern);
   for (const match of matches) {
     const domain = match[1].toLowerCase().replace(/^www\./, "");
     const allowed = config.allowedLinkDomains.some(

@@ -6,9 +6,12 @@ export const config = {
   voiceChannelId: process.env["VOICE_CHANNEL_ID"] ?? "",
 
   badWords: [
-    "küfür1", "küfür2", "orospu", "siktir", "amk", "amına", "bok", "göt", "oç",
-    "piç", "yarrak", "yarak", "orospu", "fahişe", "kahpe", "ibne", "götveren",
-    "fuck", "shit", "bitch", "ass", "damn", "cunt", "dick", "pussy",
+    "orospu", "siktir", "amk", "amına", "amina", "bok", "göt", "got", "oç", "oc",
+    "piç", "pic", "yarrak", "yarak", "fahişe", "fahise", "kahpe", "ibne",
+    "götveren", "orospu çocuğu", "orospuçocuğu", "sikerim", "sikeyim",
+    "amcık", "amcik", "götoğlanı", "ananı", "anani", "ananı sikim",
+    "fuck", "shit", "bitch", "cunt", "dick", "pussy", "asshole", "motherfucker",
+    "nigger", "nigga",
   ],
 
   allowedLinkDomains: [
@@ -22,8 +25,6 @@ export const config = {
     "github.com",
     "imgur.com",
   ],
-
-  linkPattern: /https?:\/\/([\w-]+(\.[\w-]+)+)(\/[^\s]*)?/gi,
 
   warnLimit: 3,
 };
