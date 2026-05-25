@@ -17,16 +17,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       {
         name: "Moderasyon",
         value: [
-          "`/sustur` — Kullanıcıyı sustur",
           "`/temizle` — Kanal mesajlarını temizle",
-        ].join("\n"),
-      },
-      {
-        name: "Uyarı",
-        value: [
-          "`/uyari ver` — Uyarı ver",
-          "`/uyari goruntule` — Uyarıları görüntüle",
-          "`/uyari sifirla` — Uyarıları sıfırla",
         ].join("\n"),
       },
       {
@@ -41,6 +32,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         value: [
           "Küfür içeren mesajları otomatik siler",
           "İzinsiz linkleri otomatik engeller",
+          "Mesaj spamını engeller",
+          "Büyük harf spamını engeller",
+          "Emoji spamını engeller",
+          "Tekrar eden mesajları engeller",
+          "Mention spamını engeller",
+          "Yeni satır spamını engeller",
           "3 uyarıda kullanıcı 10 dk susturulur",
         ].join("\n"),
       }

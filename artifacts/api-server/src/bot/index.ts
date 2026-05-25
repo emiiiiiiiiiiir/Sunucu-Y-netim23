@@ -12,8 +12,6 @@ import { logger } from "../lib/logger.js";
 
 import * as rolVer from "./commands/rol.js";
 import * as rolAl from "./commands/rol-al.js";
-import * as uyari from "./commands/uyari.js";
-import * as sustur from "./commands/sustur.js";
 import * as temizle from "./commands/temizle.js";
 import * as yardim from "./commands/yardim.js";
 
@@ -23,7 +21,7 @@ type CommandModule = {
 };
 
 const commands: CommandModule[] = [
-  rolVer, rolAl, uyari, sustur, temizle, yardim,
+  rolVer, rolAl, temizle, yardim,
 ];
 
 const client = new Client({

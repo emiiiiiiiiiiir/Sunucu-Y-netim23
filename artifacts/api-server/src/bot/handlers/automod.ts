@@ -1,6 +1,7 @@
 import { Message, PermissionFlagsBits, EmbedBuilder } from "discord.js";
 import { config } from "../config.js";
 import { addWarn } from "../utils/warns.js";
+import { checkSpam } from "../utils/spam.js";
 
 function containsBadWord(text: string): boolean {
   const lower = text.toLowerCase();
@@ -34,6 +35,8 @@ export async function handleAutoMod(message: Message): Promise<void> {
     reason = "küfür içeren mesaj";
   } else if (containsBlockedLink(message.content)) {
     reason = "izin verilmeyen link";
+  } else {
+    reason = checkSpam(message.author.id, message.content);
   }
 
   if (!reason) return;
