@@ -2,36 +2,24 @@ import { Message, PermissionFlagsBits, EmbedBuilder } from "discord.js";
 import { config } from "../config.js";
 import { addWarn } from "../utils/warns.js";
 import { checkSpam } from "../utils/spam.js";
+import { logger } from "../../lib/logger.js";
 
 const LINK_PATTERN = /https?:\/\/([\w-]+(\.[\w-]+)+)(\/[^\s]*)?/gi;
-
-// Kelime ayırıcılar: boşluk, noktalama, özel karakterler
 const TOKEN_SPLITTER = /[\s.,!?;:()\[\]{}"'\/\\@#\-_+=|~`]+/;
 
 function containsBadWord(text: string): boolean {
   const lower = text.toLowerCase();
-
-  // Boşluksuz versiyon: "a m k" gibi bypass girişimlerini yakala
-  // Sadece harfler arasındaki boşlukları kaldır, kelime başı/sonu korunur
   const tokens = lower.split(TOKEN_SPLITTER).filter(Boolean);
-
-  // Boşluk bypass için: sadece 1-2 karakter arası boşluklu yazımları yakala (ör. "a m k")
   const noSpaceTokens = tokens.map((t) => t.replace(/\s/g, ""));
 
   return config.badWords.some((w) => {
     const badWord = w.toLowerCase();
-
-    // Çok kelimeli ifade: tam metinde ara
     if (badWord.includes(" ")) {
       return lower.includes(badWord);
     }
-
-    // Tek kelime: her token'ın başıyla eşleştir
-    // (Türkçe ek alabilir: "amk" → "amklara", "orospu" → "orosbuya")
-    return tokens.some(
-      (token) => token === badWord || token.startsWith(badWord)
-    ) || noSpaceTokens.some(
-      (token) => token === badWord || token.startsWith(badWord)
+    return (
+      tokens.some((token) => token === badWord || token.startsWith(badWord)) ||
+      noSpaceTokens.some((token) => token === badWord || token.startsWith(badWord))
     );
   });
 }
@@ -55,10 +43,19 @@ export async function handleAutoMod(message: Message): Promise<void> {
 
   const member = await message.guild.members.fetch(message.author.id).catch(() => null);
 
-  if (member?.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-  if (config.adminRoleIds.length > 0 && config.adminRoleIds.some((id) => member?.roles.cache.has(id))) return;
+  if (member?.permissions.has(PermissionFlagsBits.ManageMessages)) {
+    logger.info({ userId: message.author.id }, "automod: yetkili atlandı");
+    return;
+  }
+
+  if (config.adminRoleIds.length > 0 && config.adminRoleIds.some((id) => member?.roles.cache.has(id))) {
+    logger.info({ userId: message.author.id }, "automod: admin rolü atlandı");
+    return;
+  }
 
   const content = message.content;
+  logger.info({ userId: message.author.id, content }, "automod: mesaj kontrol ediliyor");
+
   let reason: string | null = null;
 
   if (containsBadWord(content)) {
@@ -69,12 +66,14 @@ export async function handleAutoMod(message: Message): Promise<void> {
     reason = checkSpam(message.author.id, content);
   }
 
+  logger.info({ userId: message.author.id, reason }, "automod: sonuç");
+
   if (!reason) return;
 
   try {
     await message.delete();
-  } catch {
-    // mesaj zaten silinmiş olabilir
+  } catch (err) {
+    logger.warn({ err }, "automod: mesaj silinemedi");
   }
 
   const warnCount = addWarn(message.guild.id, message.author.id);
@@ -105,8 +104,8 @@ export async function handleAutoMod(message: Message): Promise<void> {
           .setTimestamp();
         await message.channel.send({ embeds: [muteEmbed] });
       }
-    } catch {
-      // timeout izni yoksa sessizce geç
+    } catch (err) {
+      logger.warn({ err }, "automod: timeout uygulanamadı");
     }
   }
 }
