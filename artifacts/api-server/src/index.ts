@@ -1,13 +1,13 @@
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
 import app from "./app";
 import { logger } from "./lib/logger";
-import { startBot } from "./bot/index";
 
 const rawPort = process.env["PORT"];
 
 if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+  throw new Error("PORT environment variable is required but was not provided.");
 }
 
 const port = Number(rawPort);
@@ -21,8 +21,27 @@ app.listen(port, (err) => {
     logger.error({ err }, "Error listening on port");
     process.exit(1);
   }
-
   logger.info({ port }, "Server listening");
 });
 
-startBot();
+// Discord botunu ayrı bir Node.js sürecinde başlat (bundle dışı, native modüller sorunsuz çalışır)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const botPath = path.resolve(__dirname, "../bot-js/index.mjs");
+
+const bot = spawn("node", [botPath], {
+  stdio: "inherit",
+  env: process.env,
+});
+
+bot.on("error", (err) => {
+  logger.error({ err }, "Bot süreci başlatılamadı");
+});
+
+bot.on("exit", (code, signal) => {
+  if (code !== 0) {
+    logger.warn({ code, signal }, "Bot süreci kapandı, 5 sn sonra yeniden başlatılıyor");
+    setTimeout(() => {
+      spawn("node", [botPath], { stdio: "inherit", env: process.env });
+    }, 5000);
+  }
+});

@@ -1,12 +1,13 @@
 export const config = {
-  token: process.env["DISCORD_TOKEN"] ?? "",
+  token: process.env.DISCORD_TOKEN ?? "",
 
-  adminRoleIds: (process.env["ADMIN_ROLE_IDS"] ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+  adminRoleIds: (process.env.ADMIN_ROLE_IDS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
 
-  voiceChannelId: process.env["VOICE_CHANNEL_ID"] ?? "",
+  voiceChannelId: process.env.VOICE_CHANNEL_ID ?? "",
 
-  // Tek kelimeler: token başıyla eşleşir (Türkçe ek alabilir, ör. "amklara" → amk ile yakalanır)
-  // Çok kelimeli ifadeler: tam metinde aranır
   badWords: [
     "orospu", "siktir", "amk", "amına", "amina", "bok",
     "göt", "oç", "piç", "yarrak", "yarak",
@@ -14,8 +15,8 @@ export const config = {
     "götveren", "sikerim", "sikeyim",
     "amcık", "amcik", "ananı", "anani",
     "orospu çocuğu", "orospuçocuğu", "ananı sikim",
-    "fuck", "shit", "bitch", "cunt", "dick", "pussy", "asshole", "motherfucker",
-    "nigger", "nigga",
+    "fuck", "shit", "bitch", "cunt", "dick", "pussy",
+    "asshole", "motherfucker", "nigger", "nigga",
   ],
 
   allowedLinkDomains: [

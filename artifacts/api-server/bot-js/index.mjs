@@ -4,7 +4,6 @@ import {
   Collection,
   REST,
   Routes,
-  ChatInputCommandInteraction,
   ChannelType,
 } from "discord.js";
 import {
@@ -12,24 +11,28 @@ import {
   VoiceConnectionStatus,
   entersState,
 } from "@discordjs/voice";
-import { config } from "./config.js";
-import { handleAutoMod } from "./handlers/automod.js";
-import { logger } from "../lib/logger.js";
 
-import * as rolVer from "./commands/rol.js";
-import * as rolAl from "./commands/rol-al.js";
-import * as temizle from "./commands/temizle.js";
-import * as yardim from "./commands/yardim.js";
+import { config } from "./config.mjs";
+import { handleAutoMod } from "./handlers/automod.mjs";
 
-type CommandModule = {
-  data: { name: string; toJSON: () => unknown };
-  execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
-};
+import * as rolVer from "./commands/rol-ver.mjs";
+import * as rolAl from "./commands/rol-al.mjs";
+import * as temizle from "./commands/temizle.mjs";
+import * as yardim from "./commands/yardim.mjs";
 
-const commands: CommandModule[] = [
-  rolVer, rolAl, temizle, yardim,
-];
+if (!config.token) {
+  console.error("[Bot] DISCORD_TOKEN ayarlanmamış, çıkılıyor.");
+  process.exit(1);
+}
 
+// --- Komutları kaydet ---
+const commands = [rolVer, rolAl, temizle, yardim];
+const commandMap = new Collection();
+for (const cmd of commands) {
+  commandMap.set(cmd.data.name, cmd);
+}
+
+// --- Client oluştur ---
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -41,17 +44,13 @@ const client = new Client({
   ],
 });
 
-const commandCollection = new Collection<string, CommandModule>();
-for (const cmd of commands) {
-  commandCollection.set(cmd.data.name, cmd);
-}
-
-async function joinConfiguredVoiceChannel() {
+// --- Ses kanalına bağlan ---
+async function joinVoice() {
   if (!config.voiceChannelId) return;
 
   const channel = await client.channels.fetch(config.voiceChannelId).catch(() => null);
   if (!channel || channel.type !== ChannelType.GuildVoice) {
-    logger.error("Ses kanalı bulunamadı veya geçerli bir ses kanalı değil");
+    console.error("[Bot] Ses kanalı bulunamadı veya geçersiz.");
     return;
   }
 
@@ -63,6 +62,10 @@ async function joinConfiguredVoiceChannel() {
     selfMute: true,
   });
 
+  connection.on(VoiceConnectionStatus.Ready, () => {
+    console.log(`[Bot] Ses kanalına bağlanıldı: ${channel.name}`);
+  });
+
   connection.on(VoiceConnectionStatus.Disconnected, async () => {
     try {
       await Promise.race([
@@ -70,46 +73,50 @@ async function joinConfiguredVoiceChannel() {
         entersState(connection, VoiceConnectionStatus.Connecting, 5000),
       ]);
     } catch {
-      logger.warn("Ses kanalı bağlantısı kesildi, yeniden bağlanılıyor...");
-      setTimeout(() => joinConfiguredVoiceChannel(), 5000);
+      console.warn("[Bot] Ses bağlantısı kesildi, 5 sn sonra yeniden bağlanılıyor...");
       connection.destroy();
+      setTimeout(() => joinVoice(), 5000);
     }
-  });
-
-  connection.on(VoiceConnectionStatus.Ready, () => {
-    logger.info(`Ses kanalına bağlanıldı: ${channel.name}`);
   });
 }
 
+// --- Bot hazır ---
 client.once("ready", async (c) => {
-  logger.info(`Bot hazır: ${c.user.tag}`);
+  console.log(`[Bot] Giriş yapıldı: ${c.user.tag}`);
 
+  // Slash komutlarını Discord'a kaydet
   const rest = new REST().setToken(config.token);
   try {
     const body = commands.map((cmd) => cmd.data.toJSON());
     await rest.put(Routes.applicationCommands(c.user.id), { body });
-    logger.info("Slash komutları kaydedildi (global)");
+    console.log("[Bot] Slash komutları kaydedildi.");
   } catch (err) {
-    logger.error({ err }, "Komutlar kaydedilemedi");
+    console.error("[Bot] Komutlar kaydedilemedi:", err);
   }
 
-  await joinConfiguredVoiceChannel();
+  await joinVoice();
 });
 
+// --- Mesaj geldiğinde automod ---
 client.on("messageCreate", async (message) => {
-  await handleAutoMod(message);
+  try {
+    await handleAutoMod(message);
+  } catch (err) {
+    console.error("[Bot] Automod hatası:", err);
+  }
 });
 
+// --- Slash komut geldiğinde ---
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  const cmd = commandCollection.get(interaction.commandName);
+  const cmd = commandMap.get(interaction.commandName);
   if (!cmd) return;
 
   try {
     await cmd.execute(interaction);
   } catch (err) {
-    logger.error({ err, command: interaction.commandName }, "Komut hatası");
+    console.error(`[Bot] Komut hatası (${interaction.commandName}):`, err);
     const msg = { content: "Komut çalıştırılırken hata oluştu.", ephemeral: true };
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp(msg).catch(() => {});
@@ -119,12 +126,8 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-export function startBot() {
-  if (!config.token) {
-    logger.error("DISCORD_TOKEN ayarlanmamış, bot başlatılamıyor");
-    return;
-  }
-  client.login(config.token).catch((err) => {
-    logger.error({ err }, "Bot giriş hatası");
-  });
-}
+// --- Giriş yap ---
+client.login(config.token).catch((err) => {
+  console.error("[Bot] Giriş hatası:", err);
+  process.exit(1);
+});

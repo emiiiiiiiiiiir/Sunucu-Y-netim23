@@ -1,18 +1,13 @@
-import {
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-  EmbedBuilder,
-} from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
   .setName("yardim")
   .setDescription("Bot komutlarını listele");
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export async function execute(interaction) {
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle("Moderasyon Botu - Komutlar")
-    .setDescription("Sunucu moderasyon botu komut listesi")
     .addFields(
       {
         name: "Moderasyon",
@@ -28,10 +23,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         ].join("\n"),
       },
       {
-        name: "Oto-Mod",
+        name: "Oto-Mod (Otomatik)",
         value: [
-          "Küfür içeren mesajları otomatik siler",
-          "İzinsiz linkleri otomatik engeller",
+          "Küfür içeren mesajları siler",
+          "İzinsiz linkleri engeller",
           "Mesaj spamını engeller",
           "Büyük harf spamını engeller",
           "Emoji spamını engeller",
@@ -45,5 +40,5 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .setFooter({ text: "Yalnızca yetkili üyeler moderasyon komutlarını kullanabilir." })
     .setTimestamp();
 
-  await interaction.reply({ embeds: [embed], ephemeral: true });
+  return interaction.reply({ embeds: [embed], ephemeral: true });
 }
