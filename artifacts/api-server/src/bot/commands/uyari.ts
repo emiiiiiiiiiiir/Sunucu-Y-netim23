@@ -9,44 +9,44 @@ import { hasAdminRole } from "../utils/hasAdminRole.js";
 
 export const data = new SlashCommandBuilder()
   .setName("uyari")
-  .setDescription("Uyari yonetimi")
+  .setDescription("Uyarı yönetimi")
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addSubcommand((sub) =>
     sub
       .setName("ver")
-      .setDescription("Kullaniciya uyari ver")
+      .setDescription("Kullanıcıya uyarı ver")
       .addUserOption((opt) =>
-        opt.setName("kullanici").setDescription("Kullanici").setRequired(true)
+        opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
       )
       .addStringOption((opt) =>
-        opt.setName("sebep").setDescription("Uyari sebebi").setRequired(false)
+        opt.setName("sebep").setDescription("Uyarı sebebi").setRequired(false)
       )
   )
   .addSubcommand((sub) =>
     sub
       .setName("goruntule")
-      .setDescription("Kullanicinin uyarilarini goruntule")
+      .setDescription("Kullanıcının uyarılarını görüntüle")
       .addUserOption((opt) =>
-        opt.setName("kullanici").setDescription("Kullanici").setRequired(true)
+        opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
       )
   )
   .addSubcommand((sub) =>
     sub
       .setName("sifirla")
-      .setDescription("Kullanicinin uyarilarini sifirla")
+      .setDescription("Kullanıcının uyarılarını sıfırla")
       .addUserOption((opt) =>
-        opt.setName("kullanici").setDescription("Kullanici").setRequired(true)
+        opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
       )
   );
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   if (!await hasAdminRole(interaction)) {
-    await interaction.reply({ content: "Bu komutu kullanmak icin gerekli role sahip degilsin.", ephemeral: true });
+    await interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
     return;
   }
 
   if (!interaction.guild) {
-    await interaction.reply({ content: "Bu komut sadece sunucularda kullanilabilir.", ephemeral: true });
+    await interaction.reply({ content: "Bu komut sadece sunucularda kullanılabilir.", ephemeral: true });
     return;
   }
 
@@ -59,24 +59,24 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const count = addWarn(guildId, user.id);
     const embed = new EmbedBuilder()
       .setColor(0xfee75c)
-      .setTitle("Uyari Verildi")
-      .setDescription(`${user} uyarildi.\n**Sebep:** ${sebep}\n**Toplam uyari:** ${count}`)
+      .setTitle("Uyarı Verildi")
+      .setDescription(`${user} uyarıldı.\n**Sebep:** ${sebep}\n**Toplam uyarı:** ${count}`)
       .setTimestamp();
     await interaction.reply({ embeds: [embed] });
   } else if (sub === "goruntule") {
     const count = getWarns(guildId, user.id);
     const embed = new EmbedBuilder()
       .setColor(0x5865f2)
-      .setTitle("Uyarilar")
-      .setDescription(`${user} kullanicisinin toplam **${count}** uyarisi var.`)
+      .setTitle("Uyarılar")
+      .setDescription(`${user} kullanıcısının toplam **${count}** uyarısı var.`)
       .setTimestamp();
     await interaction.reply({ embeds: [embed] });
   } else if (sub === "sifirla") {
     clearWarns(guildId, user.id);
     const embed = new EmbedBuilder()
       .setColor(0x57f287)
-      .setTitle("Uyarilar Sifirland")
-      .setDescription(`${user} kullanicisinin uyarilari sifirland.`)
+      .setTitle("Uyarılar Sıfırlandı")
+      .setDescription(`${user} kullanıcısının uyarıları sıfırlandı.`)
       .setTimestamp();
     await interaction.reply({ embeds: [embed] });
   }

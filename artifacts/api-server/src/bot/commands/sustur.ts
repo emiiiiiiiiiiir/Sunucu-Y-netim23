@@ -18,15 +18,15 @@ const durations: Record<string, number> = {
 
 export const data = new SlashCommandBuilder()
   .setName("sustur")
-  .setDescription("Kullaniciy sustur (timeout)")
+  .setDescription("Kullanıcıyı sustur (timeout)")
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Kullanici").setRequired(true)
+    opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
   )
   .addStringOption((opt) =>
     opt
       .setName("sure")
-      .setDescription("Susturma suresi")
+      .setDescription("Susturma süresi")
       .setRequired(true)
       .addChoices(
         { name: "1 dakika", value: "1dk" },
@@ -34,7 +34,7 @@ export const data = new SlashCommandBuilder()
         { name: "10 dakika", value: "10dk" },
         { name: "30 dakika", value: "30dk" },
         { name: "1 saat", value: "1saat" },
-        { name: "1 gun", value: "1gun" }
+        { name: "1 gün", value: "1gun" }
       )
   )
   .addStringOption((opt) =>
@@ -43,12 +43,12 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   if (!await hasAdminRole(interaction)) {
-    await interaction.reply({ content: "Bu komutu kullanmak icin gerekli role sahip degilsin.", ephemeral: true });
+    await interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
     return;
   }
 
   if (!interaction.guild) {
-    await interaction.reply({ content: "Bu komut sadece sunucularda kullanilabilir.", ephemeral: true });
+    await interaction.reply({ content: "Bu komut sadece sunucularda kullanılabilir.", ephemeral: true });
     return;
   }
 
@@ -59,12 +59,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const ms = durations[sureKey] ?? 60000;
 
   if (!target) {
-    await interaction.reply({ content: "Kullanici sunucuda bulunamadi.", ephemeral: true });
+    await interaction.reply({ content: "Kullanıcı sunucuda bulunamadı.", ephemeral: true });
     return;
   }
 
   if (!target.moderatable) {
-    await interaction.reply({ content: "Bu kullaniciy susturamam.", ephemeral: true });
+    await interaction.reply({ content: "Bu kullanıcıyı susturamam.", ephemeral: true });
     return;
   }
 
@@ -72,11 +72,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await target.timeout(ms, sebep);
     const embed = new EmbedBuilder()
       .setColor(0xfee75c)
-      .setTitle("Kullanici Susturuldu")
-      .setDescription(`**${user.tag}** susturuldu.\n**Sure:** ${sureKey}\n**Sebep:** ${sebep}`)
+      .setTitle("Kullanıcı Susturuldu")
+      .setDescription(`**${user.tag}** susturuldu.\n**Süre:** ${sureKey}\n**Sebep:** ${sebep}`)
       .setTimestamp();
     await interaction.reply({ embeds: [embed] });
   } catch {
-    await interaction.reply({ content: "Susturma islemi sirasinda hata olustu.", ephemeral: true });
+    await interaction.reply({ content: "Susturma işlemi sırasında hata oluştu.", ephemeral: true });
   }
 }

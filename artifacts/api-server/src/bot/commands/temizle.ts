@@ -9,12 +9,12 @@ import { hasAdminRole } from "../utils/hasAdminRole.js";
 
 export const data = new SlashCommandBuilder()
   .setName("temizle")
-  .setDescription("Kanaldan mesajlari temizle")
+  .setDescription("Kanaldan mesajları temizle")
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
   .addIntegerOption((opt) =>
     opt
       .setName("adet")
-      .setDescription("Silinecek mesaj sayisi (1-100)")
+      .setDescription("Silinecek mesaj sayısı (1-100)")
       .setMinValue(1)
       .setMaxValue(100)
       .setRequired(true)
@@ -22,7 +22,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   if (!await hasAdminRole(interaction)) {
-    await interaction.reply({ content: "Bu komutu kullanmak icin gerekli role sahip degilsin.", ephemeral: true });
+    await interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
     return;
   }
 
@@ -30,7 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const channel = interaction.channel as TextChannel | null;
 
   if (!channel || !("bulkDelete" in channel)) {
-    await interaction.reply({ content: "Bu kanalda toplu silme yapilamaz.", ephemeral: true });
+    await interaction.reply({ content: "Bu kanalda toplu silme yapılamaz.", ephemeral: true });
     return;
   }
 
@@ -44,6 +44,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const reply = await interaction.reply({ embeds: [embed], fetchReply: true });
     setTimeout(() => reply.delete().catch(() => {}), 5000);
   } catch {
-    await interaction.reply({ content: "Mesajlari silerken hata olustu. (14 gunden eski mesajlar toplu silinemez)", ephemeral: true });
+    await interaction.reply({ content: "Mesajları silerken hata oluştu. (14 günden eski mesajlar toplu silinemez)", ephemeral: true });
   }
 }

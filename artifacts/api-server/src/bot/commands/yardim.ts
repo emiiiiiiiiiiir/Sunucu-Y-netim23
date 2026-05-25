@@ -6,7 +6,7 @@ import {
 
 export const data = new SlashCommandBuilder()
   .setName("yardim")
-  .setDescription("Bot komutlarini listele");
+  .setDescription("Bot komutlarını listele");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const embed = new EmbedBuilder()
@@ -17,37 +17,35 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       {
         name: "Moderasyon",
         value: [
-          "`/ban` — Kullaniciy yasakla",
-          "`/kick` — Kullaniciy at",
-          "`/sustur` — Kullaniciy sustur",
-          "`/temizle` — Kanal mesajlarini temizle",
+          "`/sustur` — Kullanıcıyı sustur",
+          "`/temizle` — Kanal mesajlarını temizle",
         ].join("\n"),
       },
       {
-        name: "Uyari",
+        name: "Uyarı",
         value: [
-          "`/uyari ver` — Uyari ver",
-          "`/uyari goruntule` — Uyarilari goruntule",
-          "`/uyari sifirla` — Uyarilari sifirla",
+          "`/uyari ver` — Uyarı ver",
+          "`/uyari goruntule` — Uyarıları görüntüle",
+          "`/uyari sifirla` — Uyarıları sıfırla",
         ].join("\n"),
       },
       {
         name: "Rol",
         value: [
-          "`/rol-ver` — Kullaniciya rol ver",
-          "`/rol-al` — Kullanicidan rol al",
+          "`/rol-ver` — Kullanıcıya rol ver",
+          "`/rol-al` — Kullanıcıdan rol al",
         ].join("\n"),
       },
       {
         name: "Oto-Mod",
         value: [
-          "Kufur iceren mesajlari otomatik siler",
-          "Izinsiz linkleri otomatik engeller",
-          "3 uyarida kullanici 10 dk susturulur",
+          "Küfür içeren mesajları otomatik siler",
+          "İzinsiz linkleri otomatik engeller",
+          "3 uyarıda kullanıcı 10 dk susturulur",
         ].join("\n"),
       }
     )
-    .setFooter({ text: "Yalnizca yetkili uyeler moderasyon komutlarini kullanabilir." })
+    .setFooter({ text: "Yalnızca yetkili üyeler moderasyon komutlarını kullanabilir." })
     .setTimestamp();
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
