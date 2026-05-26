@@ -6,11 +6,11 @@ export const data = new SlashCommandBuilder()
   .setDescription("Bir kullanıcıyı sustur")
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Susturulacak kullanıcı").setRequired(true)
+    opt.setName("kullanıcı").setDescription("Susturulacak kullanıcı").setRequired(true)
   )
   .addIntegerOption((opt) =>
     opt
-      .setName("sure")
+      .setName("süre")
       .setDescription("Süre (dakika)")
       .setMinValue(1)
       .setMaxValue(40320)
@@ -25,8 +25,8 @@ export async function execute(interaction) {
     return interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
   }
 
-  const target = interaction.options.getMember("kullanici");
-  const sure = interaction.options.getInteger("sure");
+  const target = interaction.options.getMember("kullanıcı");
+  const sure = interaction.options.getInteger("süre");
   const sebep = interaction.options.getString("sebep") ?? "Sebep belirtilmedi";
 
   if (!target) {

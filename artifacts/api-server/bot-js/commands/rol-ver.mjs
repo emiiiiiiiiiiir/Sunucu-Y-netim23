@@ -6,7 +6,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Bir kullanıcıya rol ver")
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
+    opt.setName("kullanıcı").setDescription("Kullanıcı").setRequired(true)
   )
   .addRoleOption((opt) =>
     opt.setName("rol").setDescription("Verilecek rol").setRequired(true)
@@ -17,14 +17,13 @@ export async function execute(interaction) {
     return interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
   }
 
-  const target = interaction.options.getMember("kullanici");
+  const target = interaction.options.getMember("kullanıcı");
   const role = interaction.options.getRole("rol");
 
   if (!target || !role) {
     return interaction.reply({ content: "Kullanıcı veya rol bulunamadı.", ephemeral: true });
   }
 
-  // Komutu kullananın en yüksek rolünden üste rol veremesin
   const executor = interaction.member;
   if (executor && executor.roles.highest.position <= role.position) {
     return interaction.reply({ content: "Kendi rolünden yüksek veya eşit bir rolü veremezsin.", ephemeral: true });

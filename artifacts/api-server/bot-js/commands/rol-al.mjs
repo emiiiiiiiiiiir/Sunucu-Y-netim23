@@ -6,7 +6,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Bir kullanıcıdan rol al")
   .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Kullanıcı").setRequired(true)
+    opt.setName("kullanıcı").setDescription("Kullanıcı").setRequired(true)
   )
   .addRoleOption((opt) =>
     opt.setName("rol").setDescription("Alınacak rol").setRequired(true)
@@ -17,7 +17,7 @@ export async function execute(interaction) {
     return interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
   }
 
-  const target = interaction.options.getMember("kullanici");
+  const target = interaction.options.getMember("kullanıcı");
   const role = interaction.options.getRole("rol");
 
   if (!target || !role) {

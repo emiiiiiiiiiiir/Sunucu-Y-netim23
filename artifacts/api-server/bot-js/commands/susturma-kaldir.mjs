@@ -6,7 +6,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Bir kullanıcının susturmasını kaldır")
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addUserOption((opt) =>
-    opt.setName("kullanici").setDescription("Susturması kaldırılacak kullanıcı").setRequired(true)
+    opt.setName("kullanıcı").setDescription("Susturması kaldırılacak kullanıcı").setRequired(true)
   );
 
 export async function execute(interaction) {
@@ -14,7 +14,7 @@ export async function execute(interaction) {
     return interaction.reply({ content: "Bu komutu kullanmak için gerekli role sahip değilsin.", ephemeral: true });
   }
 
-  const target = interaction.options.getMember("kullanici");
+  const target = interaction.options.getMember("kullanıcı");
 
   if (!target) {
     return interaction.reply({ content: "Kullanıcı bulunamadı.", ephemeral: true });
