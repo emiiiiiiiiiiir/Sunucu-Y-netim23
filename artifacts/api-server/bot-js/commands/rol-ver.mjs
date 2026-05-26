@@ -24,6 +24,12 @@ export async function execute(interaction) {
     return interaction.reply({ content: "Kullanıcı veya rol bulunamadı.", ephemeral: true });
   }
 
+  // Komutu kullananın en yüksek rolünden üste rol veremesin
+  const executor = interaction.member;
+  if (executor && executor.roles.highest.position <= role.position) {
+    return interaction.reply({ content: "Kendi rolünden yüksek veya eşit bir rolü veremezsin.", ephemeral: true });
+  }
+
   const botMember = interaction.guild.members.me;
   if (!botMember || botMember.roles.highest.position <= role.position) {
     return interaction.reply({ content: "Bu rolü veremem, rolüm yeterince yüksek değil.", ephemeral: true });
