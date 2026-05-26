@@ -20,6 +20,8 @@ import { setupAutoMod } from "./utils/setupAutoMod.mjs";
 import * as rolVer from "./commands/rol-ver.mjs";
 import * as rolAl from "./commands/rol-al.mjs";
 import * as temizle from "./commands/temizle.mjs";
+import * as sustur from "./commands/sustur.mjs";
+import * as susturmaKaldir from "./commands/susturma-kaldir.mjs";
 import * as yardim from "./commands/yardim.mjs";
 
 if (!config.token) {
@@ -28,7 +30,7 @@ if (!config.token) {
 }
 
 // --- Komutları kaydet ---
-const commands = [rolVer, rolAl, temizle, yardim];
+const commands = [rolVer, rolAl, temizle, sustur, susturmaKaldir, yardim];
 const commandMap = new Collection();
 for (const cmd of commands) {
   commandMap.set(cmd.data.name, cmd);

@@ -13,6 +13,8 @@ export async function execute(interaction) {
         name: "Moderasyon",
         value: [
           "`/temizle` — Kanal mesajlarını temizle",
+          "`/sustur` — Kullanıcıyı belirtilen süre sustur",
+          "`/susturma-kaldir` — Kullanıcının susturmasını kaldır",
         ].join("\n"),
       },
       {
