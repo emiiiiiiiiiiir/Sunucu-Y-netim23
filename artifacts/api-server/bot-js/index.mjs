@@ -15,6 +15,7 @@ import {
 
 import { config } from "./config.mjs";
 import { handleAutoMod } from "./handlers/automod.mjs";
+import { setupAutoMod } from "./utils/setupAutoMod.mjs";
 
 import * as rolVer from "./commands/rol-ver.mjs";
 import * as rolAl from "./commands/rol-al.mjs";
@@ -42,6 +43,8 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.AutoModerationConfiguration,
+    GatewayIntentBits.AutoModerationExecution,
   ],
 });
 
@@ -107,12 +110,27 @@ client.once("ready", async (c) => {
     console.error("[Bot] Komutlar kaydedilemedi:", err);
   }
 
+  // Tüm sunucularda native AutoMod kurulumunu yap
+  console.log(`[AutoMod Setup] ${c.guilds.cache.size} sunucuda AutoMod kuruluyor...`);
+  for (const guild of c.guilds.cache.values()) {
+    await setupAutoMod(guild).catch((err) =>
+      console.error(`[AutoMod Setup] ${guild.name} hata:`, err?.message)
+    );
+  }
+
   await joinVoice();
+});
+
+// --- Yeni sunucuya eklenince AutoMod kur ---
+client.on("guildCreate", async (guild) => {
+  console.log(`[Bot] Yeni sunucuya eklendi: ${guild.name}`);
+  await setupAutoMod(guild).catch((err) =>
+    console.error(`[AutoMod Setup] ${guild.name} hata:`, err?.message)
+  );
 });
 
 // --- Mesaj geldiğinde automod ---
 client.on("messageCreate", async (message) => {
-  console.log(`[Debug] Mesaj alındı | Yazar: ${message.author.tag} | Bot: ${message.author.bot} | İçerik uzunluğu: ${message.content?.length ?? 0} | İçerik: "${message.content?.slice(0, 60)}"`);
   try {
     await handleAutoMod(message);
   } catch (err) {
