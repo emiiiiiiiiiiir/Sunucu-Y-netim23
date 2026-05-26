@@ -104,13 +104,16 @@ client.once("ready", async (c) => {
   console.log("[Bot] Durum ayarlandı: DND + Özel durum");
 
   // Slash komutlarını Discord'a kaydet
+  // Sunucuya özel kayıt (anında görünür, global kayıt ~1 saat sürer)
   const rest = new REST().setToken(config.token);
-  try {
-    const body = commands.map((cmd) => cmd.data.toJSON());
-    await rest.put(Routes.applicationCommands(c.user.id), { body });
-    console.log("[Bot] Slash komutları kaydedildi.");
-  } catch (err) {
-    console.error("[Bot] Komutlar kaydedilemedi:", err);
+  const body = commands.map((cmd) => cmd.data.toJSON());
+  for (const guild of c.guilds.cache.values()) {
+    try {
+      await rest.put(Routes.applicationGuildCommands(c.user.id, guild.id), { body });
+      console.log(`[Bot] Slash komutları kaydedildi: ${guild.name}`);
+    } catch (err) {
+      console.error(`[Bot] Komutlar kaydedilemedi (${guild.name}):`, err?.message);
+    }
   }
 
   // Tüm sunucularda native AutoMod kurulumunu yap
