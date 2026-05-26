@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
-  .setName("yardim")
+  .setName("yardım")
   .setDescription("Bot komutlarını listele");
 
 export async function execute(interaction) {
@@ -14,7 +14,7 @@ export async function execute(interaction) {
         value: [
           "`/temizle` — Kanal mesajlarını temizle",
           "`/sustur` — Kullanıcıyı belirtilen süre sustur",
-          "`/susturma-kaldir` — Kullanıcının susturmasını kaldır",
+          "`/susturma-kaldır` — Kullanıcının susturmasını kaldır",
         ].join("\n"),
       },
       {

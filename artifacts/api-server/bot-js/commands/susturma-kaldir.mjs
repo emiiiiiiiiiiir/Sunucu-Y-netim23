@@ -2,7 +2,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } from "discord.
 import { hasAdminRole } from "../utils/hasAdminRole.mjs";
 
 export const data = new SlashCommandBuilder()
-  .setName("susturma-kaldir")
+  .setName("susturma-kaldır")
   .setDescription("Bir kullanıcının susturmasını kaldır")
   .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
   .addUserOption((opt) =>
