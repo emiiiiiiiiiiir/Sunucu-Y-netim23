@@ -104,9 +104,18 @@ client.once("ready", async (c) => {
   console.log("[Bot] Durum ayarlandı: DND + Özel durum");
 
   // Slash komutlarını Discord'a kaydet
-  // Sunucuya özel kayıt (anında görünür, global kayıt ~1 saat sürer)
   const rest = new REST().setToken(config.token);
   const body = commands.map((cmd) => cmd.data.toJSON());
+
+  // Eski global komutları temizle (ikili görünmeyi önler)
+  try {
+    await rest.put(Routes.applicationCommands(c.user.id), { body: [] });
+    console.log("[Bot] Global komutlar temizlendi.");
+  } catch (err) {
+    console.error("[Bot] Global komutlar temizlenemedi:", err?.message);
+  }
+
+  // Sunucuya özel kayıt (anında görünür)
   for (const guild of c.guilds.cache.values()) {
     try {
       await rest.put(Routes.applicationGuildCommands(c.user.id, guild.id), { body });
