@@ -93,12 +93,13 @@ client.once("ready", async (c) => {
     status: "dnd",
     activities: [
       {
-        name: "Imperial Forces Sunucularını",
-        type: ActivityType.Watching,
+        name: "Custom Status",
+        type: ActivityType.Custom,
+        state: "Imperial Forces Sunucularını İzliyor",
       },
     ],
   });
-  console.log("[Bot] Durum ayarlandı: DND + İzliyor");
+  console.log("[Bot] Durum ayarlandı: DND + Özel durum");
 
   // Slash komutlarını Discord'a kaydet
   const rest = new REST().setToken(config.token);
