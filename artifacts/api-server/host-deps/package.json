@@ -2,7 +2,6 @@
   "name": "bot-host-deps",
   "version": "1.0.0",
   "dependencies": {
-    "@snazzah/davey": "0.1.11",
-    "@discordjs/opus": "^0.10.0"
+    "@snazzah/davey": "0.1.11"
   }
 }

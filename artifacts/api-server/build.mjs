@@ -131,19 +131,22 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   });
 }
 
-async function patchPinoPaths(distDir) {
-  const files = await readdir(distDir);
-  for (const file of files) {
-    if (!file.endsWith(".mjs")) continue;
-    const filePath = path.join(distDir, file);
-    let content = await readFile(filePath, "utf8");
-    const patched = content.replace(
-      /const outputDir = ".*?\/dist";/g,
-      'const outputDir = globalThis.__dirname || __dirname;'
-    );
-    if (patched !== content) {
-      await writeFile(filePath, patched, "utf8");
-      console.log(`Patched pino path in ${file}`);
+async function patchPinoPaths(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await patchPinoPaths(fullPath);
+    } else if (entry.name.endsWith(".mjs")) {
+      let content = await readFile(fullPath, "utf8");
+      const patched = content.replace(
+        /const outputDir = ".*?\/dist";/g,
+        'const outputDir = globalThis.__dirname || __dirname;'
+      );
+      if (patched !== content) {
+        await writeFile(fullPath, patched, "utf8");
+        console.log(`Patched pino path in ${entry.name}`);
+      }
     }
   }
 }
