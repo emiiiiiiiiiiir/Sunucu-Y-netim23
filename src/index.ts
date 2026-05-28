@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 
-const bot = spawn('node', ['--enable-source-maps', 'artifacts/api-server/dist/index.mjs'], {
+const bot = spawn('node', ['--enable-source-maps', 'artifacts/api-server/dist/src/index.mjs'], {
   stdio: 'inherit',
   shell: false
 });

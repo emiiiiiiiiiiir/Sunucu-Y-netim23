@@ -32415,7 +32415,7 @@ app_default.listen(port, (err) => {
   logger.info({ port }, "Server listening");
 });
 var __dirname2 = path.dirname(fileURLToPath(import.meta.url));
-var botPath = path.resolve(__dirname2, "../dist/bot-js/index..mjs");
+var botPath = path.resolve(__dirname2, "../bot-js/index..mjs");
 var bot = spawn("node", [botPath], {
   stdio: "inherit",
   env: process.env
