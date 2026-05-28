@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { rm } from "node:fs/promises";
+import { rm, readFile, writeFile, readdir } from "node:fs/promises";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
@@ -33,7 +33,6 @@ async function buildAll() {
     external: [
       "*.node",
       "@discordjs/opus",
-      "@discordjs/voice",
       "prism-media",
       "ffmpeg-static",
       "@snazzah/davey",
@@ -132,7 +131,26 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
   });
 }
 
-buildAll().catch((err) => {
+async function patchPinoPaths(distDir) {
+  const files = await readdir(distDir);
+  for (const file of files) {
+    if (!file.endsWith(".mjs")) continue;
+    const filePath = path.join(distDir, file);
+    let content = await readFile(filePath, "utf8");
+    const patched = content.replace(
+      /const outputDir = ".*?\/dist";/g,
+      'const outputDir = globalThis.__dirname || __dirname;'
+    );
+    if (patched !== content) {
+      await writeFile(filePath, patched, "utf8");
+      console.log(`Patched pino path in ${file}`);
+    }
+  }
+}
+
+buildAll()
+  .then(() => patchPinoPaths(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dist")))
+  .catch((err) => {
   console.error(err);
   process.exit(1);
 });
