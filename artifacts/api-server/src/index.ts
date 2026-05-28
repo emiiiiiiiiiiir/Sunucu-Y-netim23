@@ -22,7 +22,7 @@ app.listen(port, (err) => {
 
 // Discord botunu ayrı bir Node.js sürecinde başlat (bundle dışı, native modüller sorunsuz çalışır)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const botPath = path.resolve(__dirname, "../bot-js/index.mjs");
+const botPath = path.resolve(__dirname, "../dist/bot-js/index..mjs");
 
 const bot = spawn("node", [botPath], {
   stdio: "inherit",
